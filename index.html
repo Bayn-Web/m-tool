@@ -17,21 +17,14 @@
   </form>
   <script src="./autocomplete.js"></script>
   <script>
+    let data = [];
     const input = document.querySelector('input');
     setTimeout(() => {
       input.focus();
     }, 0);
-    window.addEventListener('toggle-window-event', (event) => {
-      const isHidden = event.isHidden;
-      isHidden ? input.focus() : input.blur();
+    window.electronAPI.focusInput((value) => {
+      input.focus();
     });
-    input.addEventListener('focus', () => {
-      window.electronAPI.showOptions(true)
-    });
-    input.addEventListener('blur', () => {
-      window.electronAPI.showOptions(false)
-    });
-    let data = [];
 
     (async () => {
       data = await window.electronAPI.getJsonData();
@@ -39,6 +32,7 @@
 
     input.addEventListener('keydown', async (e) => {
       if (e.key === 'Enter' && !autocomplete.shown) {
+        data = await window.electronAPI.getJsonData();
         await runExec(data.find(item => item.value === input.value).label);
       }
     });
@@ -70,14 +64,14 @@
       shouldAutoSelect: true,
       onShow: async () => {
         const json = await window.electronAPI.getJsonData();
-        console.log(json)
+        window.electronAPI.setAutoHeight(autocomplete.resultsCount);
         return json
       }
     })
 
-    addEventListener("drop", function dropHandler(ev) {
-      ev.preventDefault();
-      const file = ev.dataTransfer.items[0].getAsFile();
+    addEventListener("drop", function dropHandler(event) {
+      event.preventDefault();
+      const file = event.dataTransfer.items[0].getAsFile();
       window.electronAPI.uploadFilePath(file.path);
     })
   </script>

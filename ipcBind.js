@@ -36,14 +36,6 @@ exports.runIpcBind = (mainWindow, mainDisplay) => {
     return getJsonArray();
   });
 
-  ipcMain.handle('show-options', (_event, show) => {
-    if (!show) {
-      mainWindow.setSize(mainDisplay.size.width * 0.8, 50);
-    } else {
-      mainWindow.setSize(mainDisplay.size.width * 0.8, 300)
-    }
-  });
-
   ipcMain.handle('exec-command', async (event, filePath) => {
     return new Promise((resolve, reject) => {
       const exec = require('child_process').exec;
@@ -64,8 +56,8 @@ exports.runIpcBind = (mainWindow, mainDisplay) => {
         console.log('stderr: ' + data);
       });
 
-      workerProcess.on('close', (code) => {
-        console.log('out code：' + code);
+      workerProcess.on('close', () => {
+        console.log('exec finish');
       });
     });
   });
@@ -93,4 +85,7 @@ exports.runIpcBind = (mainWindow, mainDisplay) => {
       }
     });
   });
+  ipcMain.handle('set-auto-height', (_event, n) => {
+    mainWindow.setSize(mainDisplay.size.width * 0.8, 55 * n + 40);
+  })
 }

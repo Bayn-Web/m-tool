@@ -164,7 +164,6 @@ class Autocomplete {
   updateResults = async () => {
     this.data = await this.onShow()
     const input = this.inputNode.value
-    console.log(this.data)
     const results = this.searchFn(this.data)(input)
 
     this.hideResults()
