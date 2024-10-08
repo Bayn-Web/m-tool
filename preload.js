@@ -2,13 +2,13 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('electronAPI', {
-  exec: (filePath) => ipcRenderer.invoke('exec-command', filePath),
+  exec: (fileName) => ipcRenderer.invoke('exec-command', fileName),
   getJsonData: () => ipcRenderer.invoke('get-json-data'),
-  showOptions: (show) => ipcRenderer.invoke('show-options', show),
+  uploadFilePath: (filePath) => ipcRenderer.invoke('upload-file-path', filePath),
+  showOptions: (show) => ipcRenderer.invoke('show-options', show)
 });
 
 ipcRenderer.on('toggle-window', (event, isHidden) => {
-  console.log('Toggle window:', isHidden);
   // 触发渲染进程中的事件
-  window.dispatchEvent(new CustomEvent('toggle-window-event', { detail: isHidden }));
+  window.dispatchEvent(new CustomEvent('toggle-window-event', { isHidden }));
 });

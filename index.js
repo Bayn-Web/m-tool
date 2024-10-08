@@ -4,7 +4,6 @@ const { runIpcBind } = require('./ipcBind.js')
 const path = require('node:path')
 
 let mainWindow = undefined;
-let isHide = false;
 let isDebug = false;
 let mainDisplay = undefined;
 const createWindow = () => {
@@ -23,36 +22,29 @@ const createWindow = () => {
   mainWindow.setMenu(null);
   mainWindow.setPosition(Math.floor(mainDisplay.size.width * 0.1), Math.floor(mainDisplay.size.height * 0.2));
 
-  ipcMain.handle('show-options', (_event, show) => {
-    if (isDebug) return;
-    if (!show) {
-      mainWindow.hide();
-    } else {
-      mainWindow.setSize(mainDisplay.size.width * 0.8, 300)
-    }
-  });
-  runIpcBind(mainWindow)
+  runIpcBind(mainWindow, mainDisplay)
 }
 
 app.whenReady().then(() => {
   createWindow()
   globalShortcut.register('Alt+M', () => {
-    isHide ? mainWindow.hide() : mainWindow.show();
-    isHide = !isHide;
-    
-    mainWindow.webContents.send('toggle-window', isHide);
+    if (mainWindow.isVisible()) {
+      mainWindow.hide();
+    } else {
+      mainWindow.show();
+    }
   })
-  // globalShortcut.register('Esc', () => {
-  //   if (!isHide) {
-  //     app.exit();
-  //   }
-  // })
+  globalShortcut.register('Esc', () => {
+    if (mainWindow.isVisible()) {
+      app.exit();
+    }
+  })
 
   // debug
   globalShortcut.register('Alt+U', () => {
     isDebug = !isDebug;
     mainWindow.setSize(mainDisplay.size.width * 0.8, 300)
-    mainWindow.webContents.openDevTools()
+    setTimeout(() => { mainWindow.webContents.openDevTools({ mode: "detach", activate: true, }); }, 1000);
   })
 
   app.on('activate', () => {
