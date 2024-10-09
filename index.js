@@ -1,10 +1,8 @@
-// Modules to control application life and create native browser window
 const { app, BrowserWindow, globalShortcut, ipcMain, screen } = require('electron')
 const { runIpcBind } = require('./ipcBind.js')
 const path = require('node:path')
 
 let mainWindow = undefined;
-let isDebug = false;
 let mainDisplay = undefined;
 const createWindow = () => {
   mainDisplay = screen.getPrimaryDisplay()
@@ -43,7 +41,6 @@ app.whenReady().then(() => {
 
   // debug
   globalShortcut.register('Alt+U', () => {
-    isDebug = !isDebug;
     mainWindow.setSize(mainDisplay.size.width * 0.8, 300)
     setTimeout(() => { mainWindow.webContents.openDevTools({ mode: "detach", activate: true, }); }, 1000);
   })

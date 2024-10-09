@@ -1,6 +1,6 @@
 class Autocomplete {
   constructor({
-    data,
+    getData,
     rootNode,
     inputNode,
     resultsNode,
@@ -9,7 +9,7 @@ class Autocomplete {
     onShow = () => { },
     onHide = () => { }
   } = {}) {
-    this.data = data
+    this.getData = getData
     this.rootNode = rootNode
     this.inputNode = inputNode
     this.resultsNode = resultsNode
@@ -146,8 +146,9 @@ class Autocomplete {
 
   selectItem = node => {
     if (node) {
-      this.inputNode.value = node.querySelector('h3').innerText
-      this.hideResults()
+      this.inputNode.value = node.querySelector('h3').innerText;
+      this.inputNode.classList.add('success');
+      this.hideResults();
     }
   }
 
@@ -162,9 +163,9 @@ class Autocomplete {
   autocompleteItem = event => { }
 
   updateResults = async () => {
-    this.data = await this.onShow()
-    const input = this.inputNode.value
-    const results = this.searchFn(this.data)(input)
+    const input = this.inputNode.value;
+    const data = await this.getData();
+    const results = this.searchFn(data)(input);
 
     this.hideResults()
     if (results.length === 0) {
@@ -187,12 +188,13 @@ class Autocomplete {
     <h5>${result.label}</h5>
     </li>
   `
-    }).join('')
+    }).join('');
 
-    this.resultsNode.classList.remove('hidden')
-    this.rootNode.setAttribute('aria-expanded', true)
-    this.resultsCount = results.length
-    this.shown = true
+    this.resultsNode.classList.remove('hidden');
+    this.rootNode.setAttribute('aria-expanded', true);
+    this.resultsCount = results.length;
+    this.shown = true;
+    this.onShow()
   }
 
   hideResults = () => {

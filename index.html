@@ -31,9 +31,17 @@
     })()
 
     input.addEventListener('keydown', async (e) => {
+      // wait render
+      setTimeout(() => {
+        if (!data.some(item => item.value === input.value)) {
+          input.classList.remove('success');
+        } else {
+          if (!input.classList.contains('success'))
+            input.classList.add('success');
+        }
+      }, 0);
       if (e.key === 'Enter' && !autocomplete.shown) {
-        data = await window.electronAPI.getJsonData();
-        await runExec(data.find(item => item.value === input.value).label);
+        runExec(data.find(item => item.value === input.value).label);
       }
     });
 
@@ -41,6 +49,7 @@
       try {
         await window.electronAPI.exec(cmd);
         input.select();
+        window.electronAPI.hide();
       } catch (error) {
         console.error(error);
       }
@@ -60,19 +69,18 @@
       inputNode: document.querySelector('.autocomplete-input'),
       resultsNode: document.querySelector('.autocomplete-results'),
       searchFn: search,
-      data: data,
+      getData: async () => await window.electronAPI.getJsonData(),
       shouldAutoSelect: true,
-      onShow: async () => {
-        const json = await window.electronAPI.getJsonData();
-        window.electronAPI.setAutoHeight(autocomplete.resultsCount);
-        return json
+      onShow: async function () {
+        window.electronAPI.setAutoHeight(this.resultsCount);
       }
     })
 
-    addEventListener("drop", function dropHandler(event) {
+    addEventListener("drop", async function dropHandler(event) {
       event.preventDefault();
       const file = event.dataTransfer.items[0].getAsFile();
       window.electronAPI.uploadFilePath(file.path);
+      data = await window.electronAPI.getJsonData();
     })
   </script>
 </body>

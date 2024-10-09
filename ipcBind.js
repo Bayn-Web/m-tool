@@ -88,4 +88,7 @@ exports.runIpcBind = (mainWindow, mainDisplay) => {
   ipcMain.handle('set-auto-height', (_event, n) => {
     mainWindow.setSize(mainDisplay.size.width * 0.8, 55 * n + 40);
   })
+  ipcMain.handle('hide', () => {
+    mainWindow.hide();
+  })
 }
